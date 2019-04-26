@@ -3,6 +3,10 @@
 
 % Trabalho 2 - SVM
 
+% Abner
+% Ângela
+% Lucas
+
 pkg load statistics;
 
 clear; close all; clc;
