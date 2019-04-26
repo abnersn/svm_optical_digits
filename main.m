@@ -14,13 +14,15 @@ clear; close all; clc;
 % Leitura dos dados
 data = [csvread('training.csv'); csvread('testing.csv')];
 
-features = data(:, 1:64);
-classes = data(:, 65);
+all_features = data(:, 1:64);
+all_classes = data(:, 65);
 
-p = cvpartition(classes, 'HoldOut')
+p = cvpartition(all_classes, 'HoldOut');
 
 for i=1:50
   % Adicionar códigos aqui...
-  
-  p = repartition(p)
+  idx = training(p);
+  features = all_features(idx, :);
+
+  p = repartition(p);
 endfor
