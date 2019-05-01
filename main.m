@@ -18,7 +18,10 @@ KERNEL = 'gaussian';
 data = csvread('training.csv');
 
 all_features = data(:, 1:64);
-all_classes = data(:, 65) + 1; % Soma 1 para ajustar aos indices do MATLAB.
+% O número 1 é somado às classes para ajustá-las aos índices do MATLAB.
+% Isso significa que o número 0 corresponde à classe 1, número 1 à classe 2
+% e assim sucessivamente.
+all_classes = data(:, 65) + 1;
 
 % Particionamento Hold-Out
 p = cvpartition(all_classes, 'HoldOut');
@@ -41,8 +44,9 @@ for i=1:ITERACOES
     %% Treina array de modelos SVM, um para cada classe
     models = {};
     for j = 1:CLASSES
-        c = uint8(train_classes == j);
-        m = fitcsvm(train_features, c, 'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE);
+        m = fitcsvm(train_features, train_classes == j,...
+            'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE,...
+            'Standardize', true);
         models{j} = m;
         fprintf('- Classe %d\n', j);
     end
@@ -93,4 +97,5 @@ outputs(outputs_idx) = 1;
 plotconfusion(targets, outputs);
 
 %% Plota erros
+figure;
 plot(1:ITERACOES, errors);
