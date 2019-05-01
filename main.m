@@ -13,6 +13,7 @@ CLASSES = 10;
 ITERACOES = 2;
 CONSTANTE = 1;
 KERNEL = 'gaussian';
+PERCENTUAL_TESTE = 0.3;
 
 % Leitura dos dados
 data = csvread('training.csv');
@@ -24,7 +25,7 @@ all_features = data(:, 1:64);
 all_classes = data(:, 65) + 1;
 
 % Particionamento Hold-Out
-p = cvpartition(all_classes, 'HoldOut');
+p = cvpartition(all_classes, 'HoldOut', PERCENTUAL_TESTE);
 
 % Vetor com os erros de cada iteração
 errors = zeros(1, ITERACOES);
