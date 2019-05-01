@@ -65,7 +65,15 @@ for i=1:ITERACOES
     end
     
     %% Plota matriz de confusão
-    plotconfusion(test_classes, predictions);
+    targets = zeros(CLASSES, length(test_classes));
+    outputs = zeros(CLASSES, length(predictions));
+    subs = 1:length(test_classes);
+    targets_idx = sub2ind(size(targets), test_classes + 1, subs');
+    outputs_idx = sub2ind(size(outputs), predictions + 1, subs');
+    targets(targets_idx) = 1;
+    outputs(outputs_idx) = 1;
+    
+    plotconfusion(targets, outputs);
     
     %% Reparticiona para próximo teste
     p = repartition(p);
