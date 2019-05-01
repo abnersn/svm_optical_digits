@@ -1,10 +1,10 @@
-% UNIVERSIDADE FEDERAL DO CEAR√Å
-% T√≥picos em Sistemas de Comunica√ß√µes M√≥veis
+% UNIVERSIDADE FEDERAL DO CEAR¡
+% TÛpicos em ComunicaÁıes MÛveis
 
 % Trabalho 2 - SVM
 
 % Abner
-% √Çngela
+% ¬ngela
 % Lucas
 
 pkg load statistics;
@@ -20,9 +20,9 @@ all_classes = data(:, 65);
 p = cvpartition(all_classes, 'HoldOut');
 
 for i=1:50
-  % Adicionar c√≥digos aqui...
+  % Adicionar cÛdigos aqui...
   idx = training(p);
   features = all_features(idx, :);
 
   p = repartition(p);
-endfor
+end
