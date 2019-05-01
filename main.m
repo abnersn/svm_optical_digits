@@ -7,8 +7,6 @@
 % Ângela
 % Lucas
 
-pkg load statistics;
-
 clear; close all; clc;
 
 % Leitura dos dados
@@ -20,9 +18,7 @@ all_classes = data(:, 65);
 p = cvpartition(all_classes, 'HoldOut');
 
 for i=1:50
-  % Adicionar códigos aqui...
-  idx = training(p);
-  features = all_features(idx, :);
-
-  p = repartition(p);
+    idx = training(p);
+    features = all_features(idx, :);
+    p = repartition(p);
 end
