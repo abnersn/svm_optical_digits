@@ -21,15 +21,15 @@ data = csvread('training.csv');
 
 all_features = data(:, 1:64);
 % O número 1 é somado às classes para ajustá-las aos índices do MATLAB.
-% Isso significa que o número 0 corresponde à classe 1, número 1 à classe 2
+% Isso significa que o número 0 da base corresponde à classe 1, o número 1 à classe 2
 % e assim sucessivamente.
 all_classes = data(:, 65) + 1;
 
 % Particionamento Hold-Out
 p = cvpartition(all_classes, 'HoldOut', PERCENTUAL_TESTE);
 
-% Vetor com os erros de cada iteração
-errors = zeros(1, ITERACOES);
+% Vetor com os acertos de cada iteração
+hits = zeros(1, ITERACOES);
 
 % Array de matrizes com o resultado esperado de cada iteração (primeira
 % coluna), ao lado do resultado obtido (segunda coluna).
@@ -71,12 +71,12 @@ for i=1:ITERACOES
     
     %% Calcula predições
     fprintf('Calculando predições...\n');
-    predictions = zeros(1, p.TestSize);
+    predictions = zeros(p.TestSize, 1);
     for k=1:p.TestSize
         sample = test_features(k, :);
         
         % Array com as predições dos modelos
-        model_predictions = zeros(1, CLASSES);
+        model_predictions = zeros(CLASSES, 1);
         for j=1:CLASSES
             [label, score] = predict(models{j}, sample);
             model_predictions(j) = score(2);
@@ -89,7 +89,7 @@ for i=1:ITERACOES
     
     results(:, 1, i) = expected_output;
     results(:, 2, i) = predictions;
-    errors(i) = sum(uint8(predictions ~= expected_output'));
+    hits(i) = sum(uint8(predictions == expected_output));
     
     %% Reparticiona para próximo teste
     p = repartition(p);
@@ -109,4 +109,5 @@ plotconfusion(targets, outputs);
 
 %% Plota erros
 figure;
-plot(1:ITERACOES, errors);
+plot(1:ITERACOES, hits);
+title("Número de acertos a cada iteração");
