@@ -8,12 +8,13 @@
 % Lucas
 
 clear; close all; clc;
+rng(1);
 
 CLASSES = 10;
-ITERACOES = 2;
-CONSTANTE = 1;
-KERNEL = 'gaussian';
-PERCENTUAL_TESTE = 0.3;
+ITERACOES = 1;
+CONSTANTE = 10;
+KERNEL = 'linear';
+PERCENTUAL_TESTE = 0.1;
 
 % Leitura dos dados
 data = csvread('training.csv');
@@ -43,9 +44,20 @@ for i=1:ITERACOES
     train_classes = all_classes(train_idx);
     
     %% Treina array de modelos SVM, um para cada classe
-    models = {};
+    models = cell(CLASSES, 1);
     for j = 1:CLASSES
-        m = fitcsvm(train_features, train_classes == j,...
+        f = train_features;
+        c = train_classes == j;
+        count_ones = sum(uint8(c));
+        while length(f) > 2 * count_ones
+            r = randi([1, length(c)]);
+            while c(r)
+                r = randi([1, length(c)]);
+            end
+            f(r, :) = [];
+            c(r, :) = [];
+        end
+        m = fitcsvm(f, uint8(c),...
             'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE,...
             'Standardize', true);
         models{j} = m;
@@ -67,9 +79,7 @@ for i=1:ITERACOES
         model_predictions = zeros(1, CLASSES);
         for j=1:CLASSES
             [label, score] = predict(models{j}, sample);
-            if label == 1
-                model_predictions(j) = max(score);
-            end
+            model_predictions(j) = score(2);
         end
         
         % O modelo com a maior predição é o escolhido
@@ -79,7 +89,7 @@ for i=1:ITERACOES
     
     results(:, 1, i) = expected_output;
     results(:, 2, i) = predictions;
-    errors(i) = sum(uint8(predictions == expected_output'));
+    errors(i) = sum(uint8(predictions ~= expected_output'));
     
     %% Reparticiona para próximo teste
     p = repartition(p);
