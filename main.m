@@ -51,9 +51,9 @@ for i=1:ITERACOES
         f = train_features;
         c = train_classes == j;
         %[f ,c] = preprocessing2(f, c);
-        models{j} = fitcsvm(f, uint8(c),...
+        models{j} = fitcsvm(f, uint8(c)*j,...
             'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE,...
-            'Standardize', true);
+            'Standardize', true, 'ClassNames', {int2str(0), int2str(j)});
         fprintf('- Classe %d\n', j);
     end
     
@@ -63,23 +63,19 @@ for i=1:ITERACOES
     expected_output = all_classes(test_idx);
     
     %% Calcula predições
-    fprintf('Calculando predições...\n');
-    predictions = zeros(p.TestSize, 1);
-    for k=1:p.TestSize
-        sample = test_features(k, :);
-        
-        % Array com as predições dos modelos
-        model_predictions = zeros(CLASSES, 1);
-        for j=1:CLASSES
-            [label, score] = predict(models{j}, sample);
-            model_predictions(j) = score(2);
-        end
-        
-        % O modelo com a maior predição é o escolhido
-        [~, predicted_label] = max(model_predictions);
-        predictions(k) = predicted_label;
-    end
+    fprintf('Calculando predições...\n');    
+    % Array com as predições dos modelos
+    model_predictions = zeros(p.TestSize, CLASSES);
     
+    for j=1:CLASSES
+        [label, score] = predict(models{j}, test_features);
+        model_predictions(:, j) = score(:, 2);
+    end
+        
+    % O modelo com a maior predição é o escolhido
+    [~, predictions] = max(model_predictions, [], 2);
+    
+    % Guarda os resultados de cada iteração e soma a quantidade de acertos
     results(:, 1, i) = expected_output;
     results(:, 2, i) = predictions;
     hits(i) = sum(uint8(predictions == expected_output));
