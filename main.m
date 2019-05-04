@@ -11,13 +11,15 @@ clear; close all; clc;
 rng(1);
 
 CLASSES = 10;
-ITERACOES = 10;
+ITERACOES = 3;
 CONSTANTE = 1;
 KERNEL = 'linear';
 PERCENTUAL_TESTE = 0.3;
 
 % Leitura dos dados
 data = csvread('training.csv');
+
+%data = preprocessing(data);
 
 all_features = data(:, 1:64);
 % O número 1 é somado ás classes para ajustá-las aos índices do MATLAB.
@@ -48,15 +50,7 @@ for i=1:ITERACOES
     for j = 1:CLASSES
         f = train_features;
         c = train_classes == j;
-        count_ones = sum(uint8(c));
-        while length(f) > 2 * count_ones
-            r = randi([1, length(c)]);
-            while c(r)
-                r = randi([1, length(c)]);
-            end
-            f(r, :) = [];
-            c(r, :) = [];
-        end
+%         [f ,c] = preprocessing2(train_features, train_classes == j);
         m = fitcsvm(f, uint8(c),...
             'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE,...
             'Standardize', true);
@@ -114,6 +108,6 @@ hold on;
 x = linspace(1, ITERACOES);
 plot(x , mean(hits) * ones(1, length(x)), 'm-')
 hold off;
-acuracy = (mean(hits) * 100 / length(expected_output))
-legend('Acertos por Iteração.', "Taxa de acerto média. (" + acuracy + "%)", 'Location', 'southeastoutside');
+acuracy = (mean(hits) * 100 / length(expected_output));
+legend('Acertos por Iteração.', "Taxa de acerto média. (" + acuracy + "%)", 'Location', 'southoutside');
 title('Número de acertos a cada iteração');
