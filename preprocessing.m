@@ -1,3 +1,4 @@
+% Função responsável por deixar as classes com a mesma quantidade de amostras.
 function data_ = preprocessing (data)
     n_classes = 10;
     classes = data(:, length(data(1, :))) + 1;

@@ -16,8 +16,8 @@ CONSTANTE = 1;
 KERNEL = 'linear';
 PERCENTUAL_TESTE = 0.3;
 
-% Leitura dos dados
-data = csvread('training.csv');
+%% Importação da base
+data = [csvread('training.csv'); csvread('testing.csv')];
 
 %data = preprocessing(data);
 
@@ -27,7 +27,7 @@ all_features = data(:, 1:64);
 % e assim sucessivamente.
 all_classes = data(:, 65) + 1;
 
-% Particionamento Hold-Out
+%% Particionamento da base usando a estratégia Hold-Out
 p = cvpartition(all_classes, 'HoldOut', PERCENTUAL_TESTE);
 
 % Vetor com os acertos de cada iteração
@@ -38,23 +38,22 @@ hits = zeros(1, ITERACOES);
 results = zeros(p.TestSize, 2, ITERACOES);
 
 for i=1:ITERACOES
-    fprintf('Iteracao %d\n', i);
+    fprintf('Iteração %d\n', i);
     
     %% Separa amostras de treino
     train_idx = training(p);
     train_features = all_features(train_idx, :);
     train_classes = all_classes(train_idx);
     
-    %% Treina array de modelos SVM, um para cada classe
+    %% Treina array de modelos SVM, um para cada classe (1 vs ALL)
     models = cell(CLASSES, 1);
     for j = 1:CLASSES
         f = train_features;
         c = train_classes == j;
-%         [f ,c] = preprocessing2(train_features, train_classes == j);
-        m = fitcsvm(f, uint8(c),...
+        %[f ,c] = preprocessing2(f, c);
+        models{j} = fitcsvm(f, uint8(c),...
             'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE,...
             'Standardize', true);
-        models{j} = m;
         fprintf('- Classe %d\n', j);
     end
     
@@ -89,9 +88,8 @@ for i=1:ITERACOES
     p = repartition(p);
 end
 
-%% Plota matriz de confusão da N-ésima iteração.
-N = 1;
-r = results(:, :, N);
+%% Plota matriz de confusão média.
+r = floor(mean(results, ITERACOES));
 targets = zeros(CLASSES, p.TestSize);
 outputs = zeros(CLASSES, p.TestSize);
 subs = 1:p.TestSize;
@@ -108,6 +106,6 @@ hold on;
 x = linspace(1, ITERACOES);
 plot(x , mean(hits) * ones(1, length(x)), 'm-')
 hold off;
-acuracy = (mean(hits) * 100 / length(expected_output));
+acuracy = mean(hits) * 100 / p.TestSize;
 legend('Acertos por Iteração.', "Taxa de acerto média. (" + acuracy + "%)", 'Location', 'southoutside');
-title('Número de acertos a cada iteração');
+title("Número de acertos a cada iteração (" + p.TestSize + " amostras de teste).");
