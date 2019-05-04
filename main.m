@@ -11,13 +11,13 @@ clear; close all; clc;
 rng(1);
 
 CLASSES = 10;
-ITERACOES = 3;
+ITERACOES = 50;
 CONSTANTE = 1;
 KERNEL = 'linear';
 PERCENTUAL_TESTE = 0.3;
 
 %% Importação da base
-data = [csvread('training.csv'); csvread('testing.csv')];
+data = csvread('training.csv'); %csvread('testing.csv')];
 
 %data = preprocessing(data);
 
