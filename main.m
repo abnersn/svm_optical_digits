@@ -13,10 +13,10 @@ rng(1); % Para reproduzir os resultados
 %% Configuracoes
 CLASSES = 10;
 ATRIBUTOS = 64;
-ITERACOES = 10;
+ITERACOES = 50;
 CONSTANTE_SVM = 1;
 KERNEL = 'linear';
-USANDO_PCA = true;
+USANDO_PCA = false;
 VARIANCIA_PCA = 0.8;
 PERCENTUAL_TESTE = 0.3;
 
@@ -91,7 +91,8 @@ for i=1:ITERACOES
         models{j} = fitcsvm(f, uint8(c)*j,...
             'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE_SVM,...
             'Standardize', true, 'ClassNames', {int2str(0), int2str(j)});
-        waitbar(i/ITERACOES, w, sprintf('Iteracao %d - Caractere %d', i, j - 1))
+        progress = (i - 1 + (j/CLASSES)) / ITERACOES;
+        waitbar(progress , w, sprintf('Iteracao %d - Caractere %d  (%.2f%%)', i, j - 1, progress*100))
     end
     
     %% Separa amostras de teste
@@ -143,7 +144,7 @@ hold on;
 x = linspace(1, i);
 plot(x , mean(accuracy(1:i)) * ones(1, length(x)), 'm-')
 hold off;
-legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy) + "%)", 'Location', 'southoutside');
+legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy(1:i)) + "%)", 'Location', 'southoutside');
 title("Taxa de acertos a cada iteracao (" + p.TestSize + " amostras de teste).");
 xlabel('Iteracao');
 ylabel('Acertos (%)');
