@@ -149,6 +149,7 @@ ylabel('Acertos (%)');
 
 
 %% Plota tempo das iteracoes executadas
+%figure;
 subplot(1, 2, 2);
 plot(1:i, times(1:i), 'bo--');
 hold on;
@@ -156,9 +157,9 @@ x = linspace(1, i);
 plot(x , mean(times(1:i)) * ones(1, length(x)), 'm-')
 hold off;
 legend('Tempo de execucao por iteracao.', "Tempo medio. (" + mean(times(1:i)) + ")", 'Location', 'southoutside');
-title("Tempo de execucao");
+title("Tempo de execucao (" + sum(times) + " s).");
 xlabel('Iteracao');
-ylabel('Tempo (%)');
+ylabel('Tempo (s)');
 
 
 %% Plota matriz de confusao media.
