@@ -142,13 +142,8 @@ hold on;
 x = linspace(1, i);
 plot(x , mean(accuracy) * ones(1, length(x)), 'm-')
 hold off;
-<<<<<<< HEAD
 legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy(1:i)) + "%)", 'Location', 'southoutside');
 title("Taxa de acertos a cada iteracao (" + p.TestSize + " amostras de teste).");
-=======
-legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy) + "%)", 'Location', 'southoutside');
-title("Taxa de acertos (" + p.TestSize + " amostras de teste).");
->>>>>>> e5f709f442b08a0d0bad33ca0fe0a499495e155d
 xlabel('Iteracao');
 ylabel('Acertos (%)');
 
