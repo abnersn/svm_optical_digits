@@ -28,13 +28,16 @@ data = csvread('training.csv'); %csvread('testing.csv')];
 % Usando todos os atributos da base.
 all_features = data(:, 1:(length(data(1, :))-1));
 
-% Usando PCA a fim de diminuir a quantidade de atributos, logo a complexidade.
-% all_features = PCA(data, 0.8);
-
 % O numero 1 e somado as classes para ajusta-las aos indices do MATLAB.
 % Isso significa que o numero 0 da base corresponde a classe 1, o numero 1 a classe 2
 % e assim sucessivamente.
 all_classes = data(:, length(data(1, :))) + 1;
+
+% Plota grafico 3D das 3 primeiras componentes principais
+visualizacao_pca(all_features, all_classes, CLASSES);
+
+% Usando PCA a fim de diminuir a quantidade de atributos, logo a complexidade.
+% all_features = PCA(data, 0.8);
 
 %% Particionamento da base usando a estrategia Hold-Out
 p = cvpartition(all_classes, 'HoldOut', PERCENTUAL_TESTE);
