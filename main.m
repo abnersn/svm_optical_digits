@@ -27,7 +27,7 @@ data = csvread('training.csv'); %csvread('testing.csv')];
 %all_features = data(:, 1:(length(data(1, :))-1));
 
 % Usando PCA a fim de diminuir a quantidade de atributos, logo a complexidade.
-all_features = PCA(data, 0.8);
+all_features = PCA(data, 0.95);
 
 % O número 1 é somado ás classes para ajustá-las aos índices do MATLAB.
 % Isso significa que o número 0 da base corresponde à classe 1, o número 1 à classe 2
