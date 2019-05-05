@@ -43,9 +43,6 @@ data = csvread('training.csv'); %csvread('testing.csv')];
 % a classe 2, e assim sucessivamente.
 all_classes = data(:, size(data, 2)) + 1;
 
-% Plota grafico 3D das 3 primeiras componentes principais
-visualizacao_pca(data(:, 1:ATRIBUTOS), all_classes, CLASSES);
-
 % Usando PCA a fim de diminuir a quantidade de atributos, logo a complexidade.
 if USANDO_PCA
     all_features = PCA(data(:, 1:ATRIBUTOS), VARIANCIA_PCA);
@@ -65,13 +62,18 @@ p = cvpartition(all_classes, 'HoldOut', PERCENTUAL_TESTE);
 % Vetor para armazenar os acertos de cada iteracao
 hits = zeros(1, ITERACOES);
 
+% Vetor para armazenar o tempo em cada iteracao
+times = zeros(1, ITERACOES);
+
 % Array de matrizes com o resultado esperado de cada iteracao (primeira
 % coluna), ao lado do resultado obtido (segunda coluna).
 results = zeros(p.TestSize, 2, ITERACOES);
 
 %% Loop principal
+tic;
 for i=1:ITERACOES
-
+    t = tic;
+    
     % Verifica se botao de cancelar foi pressionado
     if getappdata(w,'canceling')
         i = i - 1;
@@ -120,11 +122,52 @@ for i=1:ITERACOES
     
     %% Reparticiona para proximo teste
     p = repartition(p);
+    
+    %% Tempo de execucao
+    times(i) = toc(t);
 end
 
 delete(w);
 
+%% Plota grafico 3D das 3 primeiras componentes principais
+visualizacao_pca(data(:, 1:ATRIBUTOS), all_classes, CLASSES);
+
+%% Plota erros das iteracoes executadas
+figure;
+subplot(1, 2, 1);
+accuracy = hits * 100 / p.TestSize;
+accuracy = accuracy(1:i);
+plot(1:i, accuracy, 'bo--');
+hold on;
+x = linspace(1, i);
+plot(x , mean(accuracy) * ones(1, length(x)), 'm-')
+hold off;
+<<<<<<< HEAD
+legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy(1:i)) + "%)", 'Location', 'southoutside');
+title("Taxa de acertos a cada iteracao (" + p.TestSize + " amostras de teste).");
+=======
+legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy) + "%)", 'Location', 'southoutside');
+title("Taxa de acertos (" + p.TestSize + " amostras de teste).");
+>>>>>>> e5f709f442b08a0d0bad33ca0fe0a499495e155d
+xlabel('Iteracao');
+ylabel('Acertos (%)');
+
+
+%% Plota tempo das iteracoes executadas
+subplot(1, 2, 2);
+plot(1:i, times(1:i), 'bo--');
+hold on;
+x = linspace(1, i);
+plot(x , mean(times(1:i)) * ones(1, length(x)), 'm-')
+hold off;
+legend('Tempo de execucao por iteracao.', "Tempo medio. (" + mean(times(1:i)) + ")", 'Location', 'southoutside');
+title("Tempo de execucao");
+xlabel('Iteracao');
+ylabel('Tempo (%)');
+
+
 %% Plota matriz de confusao media.
+figure;
 r = floor(mean(results, ITERACOES));
 targets = zeros(CLASSES, p.TestSize);
 outputs = zeros(CLASSES, p.TestSize);
@@ -133,18 +176,4 @@ targets_idx = sub2ind(size(targets), r(:, 1), subs');
 outputs_idx = sub2ind(size(outputs), r(:, 2), subs');
 targets(targets_idx) = 1;
 outputs(outputs_idx) = 1;
-figure;
 plotconfusion(targets, outputs);
-
-%% Plota erros das iteracoes executadas
-figure;
-accuracy = hits * 100 / p.TestSize;
-plot(1:i, accuracy(1:i), 'bo--');
-hold on;
-x = linspace(1, i);
-plot(x , mean(accuracy(1:i)) * ones(1, length(x)), 'm-')
-hold off;
-legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy(1:i)) + "%)", 'Location', 'southoutside');
-title("Taxa de acertos a cada iteracao (" + p.TestSize + " amostras de teste).");
-xlabel('Iteracao');
-ylabel('Acertos (%)');
