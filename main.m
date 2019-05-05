@@ -19,13 +19,20 @@ PERCENTUAL_TESTE = 0.3;
 %% Importação da base
 data = csvread('training.csv'); %csvread('testing.csv')];
 
+%% Pre processamento
 %data = preprocessing(data);
 
-all_features = data(:, 1:64);
+
+% Usando todos os atributos da base.
+%all_features = data(:, 1:(length(data(1, :))-1));
+
+% Usando PCA a fim de diminuir a quantidade de atributos, logo a complexidade.
+all_features = PCA(data, 0.8);
+
 % O número 1 é somado ás classes para ajustá-las aos índices do MATLAB.
 % Isso significa que o número 0 da base corresponde à classe 1, o número 1 à classe 2
 % e assim sucessivamente.
-all_classes = data(:, 65) + 1;
+all_classes = data(:, length(data(1, :))) + 1;
 
 %% Particionamento da base usando a estratégia Hold-Out
 p = cvpartition(all_classes, 'HoldOut', PERCENTUAL_TESTE);
