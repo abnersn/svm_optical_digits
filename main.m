@@ -97,11 +97,11 @@ plotconfusion(targets, outputs);
 
 %% Plota erros
 figure;
-plot(1:ITERACOES, hits, 'bo--');
+accuracy = hits * 100 / p.TestSize;
+plot(1:ITERACOES, accuracy, 'bo--');
 hold on;
 x = linspace(1, ITERACOES);
-plot(x , mean(hits) * ones(1, length(x)), 'm-')
+plot(x , mean(accuracy) * ones(1, length(x)), 'm-')
 hold off;
-acuracy = mean(hits) * 100 / p.TestSize;
-legend('Acertos por Iteração.', "Taxa de acerto média. (" + acuracy + "%)", 'Location', 'southoutside');
-title("Número de acertos a cada iteração (" + p.TestSize + " amostras de teste).");
+legend('Taxa de acertos por iteração.', "Taxa de acerto média. (" + mean(accuracy) + "%)", 'Location', 'southoutside');
+title("Taxa de acertos a cada iteração (" + p.TestSize + " amostras de teste).");
