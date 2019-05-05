@@ -8,6 +8,6 @@ function features = PCA(data, percentage)
         p = (sum(var(1:offset)) / sum(var));
         offset = offset + 1;
     end
-    fprintf('As %d primeiras componentes explicam %.2f %% da variancia dos dados.\n', offset, (sum(var(1:offset)) / sum(var))*100);
+    fprintf('\nAs %d primeiras componentes explicam %.2f%% da variancia dos dados.\n', offset, (sum(var(1:offset)) / sum(var))*100);
     features = dados(:, 1:offset);
 end

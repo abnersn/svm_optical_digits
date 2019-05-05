@@ -7,50 +7,76 @@
 % Angela
 % Lucas
 
-clear; close all; clc;
-rng(1);
+clear; close all force; clc;
+rng(1); % Para reproduzir os resultados
 
+%% Configuracoes
 CLASSES = 10;
-ITERACOES = 50;
-CONSTANTE = 1;
+ATRIBUTOS = 64;
+ITERACOES = 10;
+CONSTANTE_SVM = 1;
 KERNEL = 'linear';
+USANDO_PCA = true;
+VARIANCIA_PCA = 0.8;
 PERCENTUAL_TESTE = 0.3;
 
-%% Importacao da base
+fprintf('*** Execucao do SVM sobre a base Optical Digits (https://bit.ly/2xDW3IY) ***\n\n');
+fprintf('Configuracoes da base:\n');
+fprintf('- Classes: %d\n', CLASSES);
+fprintf('- Atributos: %d\n', ATRIBUTOS);
+fprintf('- Iteracoes: %d\n', ITERACOES);
+if USANDO_PCA
+    fprintf('- Variancia minima PCA: %.2f%%\n', VARIANCIA_PCA * 100);
+end
+fprintf('\nConfiguracoes de particionamento:\n');
+fprintf('- Metodo: Hold Out\n');
+fprintf('- Percentual para teste: %.2f%%\n', PERCENTUAL_TESTE * 100);
+fprintf('\nConfiguracoes do modelo:\n');
+fprintf('- Constante de penalidade: %d\n', CONSTANTE_SVM);
+fprintf('- Kernel: %s\n', KERNEL);
+
+%% Importacao e processamento inicial da base
 data = csvread('training.csv'); %csvread('testing.csv')];
 
-%% Pre processamento
-%data = preprocessing(data);
-
-% Binarizacao da base, pre-processamento opcional
-%data(:, 1:(length(data(1, :))-1)) = (data(:, 1:(length(data(1, :))-1)) * 2 / max(max(data))) >= 1;
-
-% Usando todos os atributos da base.
-all_features = data(:, 1:(length(data(1, :))-1));
-
-% O numero 1 e somado as classes para ajusta-las aos indices do MATLAB.
-% Isso significa que o numero 0 da base corresponde a classe 1, o numero 1 a classe 2
-% e assim sucessivamente.
-all_classes = data(:, length(data(1, :))) + 1;
+% O numero 1 sera somado as classes para ajusta-las aos indices do MATLAB.
+% Isso significa que o numero 0 da base corresponde a classe 1, o numero 1
+% a classe 2, e assim sucessivamente.
+all_classes = data(:, size(data, 2)) + 1;
 
 % Plota grafico 3D das 3 primeiras componentes principais
-visualizacao_pca(all_features, all_classes, CLASSES);
+visualizacao_pca(data(:, 1:ATRIBUTOS), all_classes, CLASSES);
 
 % Usando PCA a fim de diminuir a quantidade de atributos, logo a complexidade.
-% all_features = PCA(data, 0.8);
+if USANDO_PCA
+    all_features = PCA(data(:, 1:ATRIBUTOS), VARIANCIA_PCA);
+else
+    all_features = data(:, 1:ATRIBUTOS);
+end
+
+% Barra de progresso
+w = waitbar(0,'Iteracao 1, Classe 0','Name','Treinando modelos...',...
+    'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
+fprintf('-------------\n');
 
 %% Particionamento da base usando a estrategia Hold-Out
 p = cvpartition(all_classes, 'HoldOut', PERCENTUAL_TESTE);
 
-% Vetor com os acertos de cada iteracao
+%% Armazenagem dos resultados
+% Vetor para armazenar os acertos de cada iteracao
 hits = zeros(1, ITERACOES);
 
 % Array de matrizes com o resultado esperado de cada iteracao (primeira
 % coluna), ao lado do resultado obtido (segunda coluna).
 results = zeros(p.TestSize, 2, ITERACOES);
 
+%% Loop principal
 for i=1:ITERACOES
-    fprintf('Iteracao %d\n', i);
+
+    % Verifica se botao de cancelar foi pressionado
+    if getappdata(w,'canceling')
+        i = i - 1;
+        break
+    end
     
     %% Separa amostras de treino
     train_idx = training(p);
@@ -62,11 +88,10 @@ for i=1:ITERACOES
     for j = 1:CLASSES
         f = train_features;
         c = train_classes == j;
-        %[f ,c] = preprocessing2(f, c);
         models{j} = fitcsvm(f, uint8(c)*j,...
-            'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE,...
+            'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE_SVM,...
             'Standardize', true, 'ClassNames', {int2str(0), int2str(j)});
-        fprintf('- Classe %d\n', j);
+        waitbar(i/ITERACOES, w, sprintf('Iteracao %d - Caractere %d', i, j - 1))
     end
     
     %% Separa amostras de teste
@@ -75,7 +100,7 @@ for i=1:ITERACOES
     expected_output = all_classes(test_idx);
     
     %% Calcula predicoes
-    fprintf('Calculando predicoes...\n');    
+    
     % Array com as predicoes dos modelos
     model_predictions = zeros(p.TestSize, CLASSES);
     
@@ -84,7 +109,7 @@ for i=1:ITERACOES
         model_predictions(:, j) = score(:, 2);
     end
         
-    % O modelo com a maior predicao e o escolhido
+    % O modelo com a maior predicao sera o escolhido
     [~, predictions] = max(model_predictions, [], 2);
     
     % Guarda os resultados de cada iteracao e soma a quantidade de acertos
@@ -96,6 +121,8 @@ for i=1:ITERACOES
     p = repartition(p);
 end
 
+delete(w);
+
 %% Plota matriz de confusao media.
 r = floor(mean(results, ITERACOES));
 targets = zeros(CLASSES, p.TestSize);
@@ -105,15 +132,18 @@ targets_idx = sub2ind(size(targets), r(:, 1), subs');
 outputs_idx = sub2ind(size(outputs), r(:, 2), subs');
 targets(targets_idx) = 1;
 outputs(outputs_idx) = 1;
+figure;
 plotconfusion(targets, outputs);
 
-%% Plota erros
+%% Plota erros das iteracoes executadas
 figure;
 accuracy = hits * 100 / p.TestSize;
-plot(1:ITERACOES, accuracy, 'bo--');
+plot(1:i, accuracy(1:i), 'bo--');
 hold on;
-x = linspace(1, ITERACOES);
-plot(x , mean(accuracy) * ones(1, length(x)), 'm-')
+x = linspace(1, i);
+plot(x , mean(accuracy(1:i)) * ones(1, length(x)), 'm-')
 hold off;
 legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy) + "%)", 'Location', 'southoutside');
 title("Taxa de acertos a cada iteracao (" + p.TestSize + " amostras de teste).");
+xlabel('Iteracao');
+ylabel('Acertos (%)');
