@@ -1,10 +1,10 @@
-% UNIVERSIDADE FEDERAL DO CEARÁ
-% Tópicos em Comunicações Móveis
+% UNIVERSIDADE FEDERAL DO CEARA
+% Topicos em Comunicacoes Moveis
 
 % Trabalho 2 - SVM
 
 % Abner
-% Ângela
+% Angela
 % Lucas
 
 clear; close all; clc;
@@ -15,11 +15,11 @@ CONSTANTE = 1;
 KERNEL = 'linear';
 PERCENTAGE = 0.5;
 
-%% Importação das bases (Na base 'train' foram usados padrões de 30 pessoas e na base 'test' foram 13 pessoas diferentes)
+%% Importacao das bases (Na base 'train' foram usados padroes de 30 pessoas e na base 'test' foram 13 pessoas diferentes)
 train = csvread('training.csv');
 test = csvread('testing.csv');
 
-%% Divisão e Pré-processamento
+%% Divisao e Pre-processamento
 % Usando todos os atributos da base.
 train_features = train(:, 1:(length(train(1, :))-1));
 test_features = test(:, 1:(length(test(1, :))-1));
@@ -28,19 +28,19 @@ test_features = test(:, 1:(length(test(1, :))-1));
 %train_features = PCA(train, 0.8);
 %test_features = PCA(test, 0.8);
 
-% O número 1 é somado ás classes para ajustá-las aos índices do MATLAB.
-% Isso significa que o número 0 da base corresponde à classe 1, o número 1 à classe 2
+% O numero 1 e somado as classes para ajusta-las aos indices do MATLAB.
+% Isso significa que o numero 0 da base corresponde a classe 1, o numero 1 a classe 2
 % e assim sucessivamente.
 train_classes = train(:, length(train(1, :))) + 1;
 test_classes = test(:, length(test(1, :))) + 1;
 
-%% Particionamento da base usando a estratégia Hold-Out (Neste, usando as bases já divididas!)
+%% Particionamento da base usando a estrategia Hold-Out (Neste, usando as bases ja divididas!)
 p = cvpartition(test_classes, 'HoldOut', PERCENTAGE);
 NUM_TEST = p.TrainSize;
-% Vetor com os acertos de cada iteração
+% Vetor com os acertos de cada iteracao
 hits = zeros(1, ITERACOES);
 
-% Array de matrizes com o resultado esperado de cada iteração (primeira
+% Array de matrizes com o resultado esperado de cada iteracao (primeira
 % coluna), ao lado do resultado obtido (segunda coluna).
 results = zeros(NUM_TEST, 2, ITERACOES);
 
@@ -55,16 +55,16 @@ results = zeros(NUM_TEST, 2, ITERACOES);
     end
 
 for i=1:ITERACOES
-    fprintf('Iteração %d\n', i);
+    fprintf('Iteracao %d\n', i);
     
     %% Separa amostras de teste
     test_idx = training(p);
     features = test_features(test_idx, :);
     classes = test_classes(test_idx);
     
-    %% Calcula predições
-    fprintf('Calculando predições...\n');    
-    % Array com as predições dos modelos
+    %% Calcula predicoes
+    fprintf('Calculando predicoes...\n');    
+    % Array com as predicoes dos modelos
     model_predictions = zeros(NUM_TEST, CLASSES);
     
     for j=1:CLASSES
@@ -72,19 +72,19 @@ for i=1:ITERACOES
         model_predictions(:, j) = score(:, 2);
     end
         
-    % O modelo com a maior predição é o escolhido
+    % O modelo com a maior predicao e o escolhido
     [~, predictions] = max(model_predictions, [], 2);
     
-    % Guarda os resultados de cada iteração e soma a quantidade de acertos
+    % Guarda os resultados de cada iteracao e soma a quantidade de acertos
     results(:, 1, i) = classes;
     results(:, 2, i) = predictions;
     hits(i) = sum(uint8(predictions == classes));
     
-    %% Reparticiona para próximo teste
+    %% Reparticiona para proximo teste
     p = repartition(p);
 end
 
-%% Plota matriz de confusão média.
+%% Plota matriz de confusao media.
 r = floor(mean(results, ITERACOES));
 targets = zeros(CLASSES, NUM_TEST);
 outputs = zeros(CLASSES, NUM_TEST);
@@ -103,5 +103,5 @@ hold on;
 x = linspace(1, ITERACOES);
 plot(x , mean(accuracy) * ones(1, length(x)), 'm-')
 hold off;
-legend('Taxa de acertos por iteração.', "Taxa de acerto média. (" + mean(accuracy) + "%)", 'Location', 'southoutside');
-title("Taxa de acertos a cada iteração (" + NUM_TEST + " amostras de teste).");
+legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy) + "%)", 'Location', 'southoutside');
+title("Taxa de acertos a cada iteracao (" + NUM_TEST + " amostras de teste).");
