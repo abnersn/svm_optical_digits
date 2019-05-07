@@ -18,7 +18,7 @@ end
 
 lgd = strings(num_classes, 1);
 for i = 1:num_classes
-    lgd(i) = sprintf('Caractere %d', i - 1);
+    lgd(i) = sprintf('Numero %d', i - 1);
 end
 
 grid on;
