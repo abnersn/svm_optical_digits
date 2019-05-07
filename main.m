@@ -15,7 +15,7 @@ CLASSES = 10;
 ATRIBUTOS = 64;
 ITERACOES = 50;
 CONSTANTE_SVM = 1;
-KERNEL = 'linear';
+KERNEL = 'polynomial';
 USANDO_PCA = false;
 VARIANCIA_PCA = 0.8;
 PERCENTUAL_TESTE = 0.3;
@@ -90,7 +90,7 @@ for i=1:ITERACOES
     for j = 1:CLASSES
         c = train_classes == j;
         models{j} = fitcsvm(train_features, uint8(c)*j,...
-            'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE_SVM,...
+            'KernelFunction', KERNEL, 'PolynomialOrder', 2, 'BoxConstraint', CONSTANTE_SVM,...
             'Standardize', true, 'ClassNames', {int2str(0), int2str(j)});
         progress = (i - 1 + (j/CLASSES)) / ITERACOES;
         waitbar(progress , w, sprintf('Iteracao %d - Numero %d - (%.2f%%)', i, j - 1, progress*100))
