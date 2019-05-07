@@ -88,13 +88,12 @@ for i=1:ITERACOES
     %% Treina array de modelos SVM, um para cada classe (1 vs ALL)
     models = cell(CLASSES, 1);
     for j = 1:CLASSES
-        f = train_features;
         c = train_classes == j;
-        models{j} = fitcsvm(f, uint8(c)*j,...
+        models{j} = fitcsvm(train_features, uint8(c)*j,...
             'KernelFunction', KERNEL, 'BoxConstraint', CONSTANTE_SVM,...
             'Standardize', true, 'ClassNames', {int2str(0), int2str(j)});
         progress = (i - 1 + (j/CLASSES)) / ITERACOES;
-        waitbar(progress , w, sprintf('Iteracao %d - Caractere %d  (%.2f%%)', i, j - 1, progress*100))
+        waitbar(progress , w, sprintf('Iteracao %d - Numero %d - (%.2f%%)', i, j - 1, progress*100))
     end
     
     %% Separa amostras de teste
@@ -132,7 +131,7 @@ delete(w);
 %% Plota grafico 3D das 3 primeiras componentes principais
 visualizacao_pca(data(:, 1:ATRIBUTOS), all_classes, CLASSES);
 
-%% Plota erros das iteracoes executadas
+%% Plota acertos das iteracoes executadas
 figure;
 subplot(1, 2, 1);
 accuracy = hits * 100 / p.TestSize;
@@ -142,7 +141,7 @@ hold on;
 x = linspace(1, i);
 plot(x , mean(accuracy) * ones(1, length(x)), 'm-')
 hold off;
-legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy(1:i)) + "%)", 'Location', 'southoutside');
+legend('Taxa de acertos por iteracao.', "Taxa de acerto media. (" + mean(accuracy) + "%)", 'Location', 'southoutside');
 title("Taxa de acertos a cada iteracao (" + p.TestSize + " amostras de teste).");
 xlabel('Iteracao');
 ylabel('Acertos (%)');
@@ -151,13 +150,16 @@ ylabel('Acertos (%)');
 %% Plota tempo das iteracoes executadas
 %figure;
 subplot(1, 2, 2);
-plot(1:i, times(1:i), 'bo--');
+times = times(1:i);
+plot(1:i, times, 'bo--');
 hold on;
 x = linspace(1, i);
-plot(x , mean(times(1:i)) * ones(1, length(x)), 'm-')
+plot(x , mean(times) * ones(1, length(x)), 'm-')
 hold off;
-legend('Tempo de execucao por iteracao.', "Tempo medio. (" + mean(times(1:i)) + ")", 'Location', 'southoutside');
-title("Tempo de execucao (" + sum(times) + " s).");
+legend('Tempo de execucao por iteracao.', "Tempo medio. (" + mean(times) + ")", 'Location', 'southoutside');
+mins = floor(sum(times) / 60);
+segs = floor(mod(sum(times), 60));
+title("Tempo de execucao (" + mins + "min e " + segs + "s).");
 xlabel('Iteracao');
 ylabel('Tempo (s)');
 
