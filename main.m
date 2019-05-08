@@ -90,7 +90,7 @@ for i=1:ITERACOES
     for j = 1:CLASSES
         c = train_classes == j;
         models{j} = fitcsvm(train_features, uint8(c)*j,...
-            'KernelFunction', KERNEL, 'PolynomialOrder', 2, 'BoxConstraint', CONSTANTE_SVM,...
+            'KernelFunction', KERNEL,'PolynomialOrder', 2, 'BoxConstraint', CONSTANTE_SVM,...
             'Standardize', true, 'ClassNames', {int2str(0), int2str(j)});
         progress = (i - 1 + (j/CLASSES)) / ITERACOES;
         waitbar(progress , w, sprintf('Iteracao %d - Numero %d - (%.2f%%)', i, j - 1, progress*100))
@@ -132,8 +132,8 @@ delete(w);
 visualizacao_pca(data(:, 1:ATRIBUTOS), all_classes, CLASSES);
 
 %% Plota acertos das iteracoes executadas
-figure;
-subplot(1, 2, 1);
+figure('Units','normalized','Position',[0 0 1 1]);
+%subplot(1, 2, 1);
 accuracy = hits * 100 / p.TestSize;
 accuracy = accuracy(1:i);
 plot(1:i, accuracy, 'bo--');
@@ -148,8 +148,8 @@ ylabel('Acertos (%)');
 
 
 %% Plota tempo das iteracoes executadas
-%figure;
-subplot(1, 2, 2);
+figure('Units','normalized','Position',[0 0 1 1]);
+%subplot(1, 2, 2);
 times = times(1:i);
 plot(1:i, times, 'bo--');
 hold on;
@@ -165,7 +165,7 @@ ylabel('Tempo (s)');
 
 
 %% Plota matriz de confusao media.
-figure;
+figure();
 r = floor(mean(results, ITERACOES));
 targets = zeros(CLASSES, p.TestSize);
 outputs = zeros(CLASSES, p.TestSize);

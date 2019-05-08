@@ -7,7 +7,7 @@ componentes = componentes(:, 1:3);
 var = sum(var(1:3)) * 100 / sum(var);
 
 colors = {[.8 0 0] [0 .8 0] [0 0 .8] [.8 .8 0] [.8 0 .8] [0 .8 .8] [0 0 0] [.3 .3 .3] [.5 .5 .5] [.8 .8 .8]};
-figure;
+figure('Units','normalized','Position',[0 0 1 1])
 hold on;
 for i = 1:num_classes
     indexes = classes == i;
