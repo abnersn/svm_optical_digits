@@ -2,11 +2,12 @@ function visualizacao_pca(samples, classes, num_classes)
 %VISUALIZACAO_PCA Exibe grafico 3D com as 3 primeiras componentes
 %principais da base de dados.
 
-[~, componentes] = pca(samples);
+[~, componentes, var] = pca(samples);
 componentes = componentes(:, 1:3);
+var = sum(var(1:3)) * 100 / sum(var);
 
 colors = {[.8 0 0] [0 .8 0] [0 0 .8] [.8 .8 0] [.8 0 .8] [0 .8 .8] [0 0 0] [.3 .3 .3] [.5 .5 .5] [.8 .8 .8]};
-figure;
+figure('Units','normalized','Position',[0 0 1 1])
 hold on;
 for i = 1:num_classes
     indexes = classes == i;
@@ -17,12 +18,12 @@ end
 
 lgd = strings(num_classes, 1);
 for i = 1:num_classes
-    lgd(i) = sprintf('Caractere %d', i - 1);
+    lgd(i) = sprintf('Numero %d', i - 1);
 end
 
 grid on;
-legend(lgd);
-title('Visualizacao das 3 primeiras componentes principais');
+legend(lgd, 'Location', 'eastoutside');
+title("Visualizacao das 3 primeiras componentes principais ("+var+"%)");
 xlabel('1o Componente');
 ylabel('2o Componente');
 zlabel('3o Componente');
