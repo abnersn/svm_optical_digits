@@ -14,13 +14,16 @@ https://archive.ics.uci.edu/ml/datasets/optical+recognition+of+handwritten+digit
 
 Classificador da base Optical Digits usando **SVM** com estratégia **1 vs ALL** usando estratégia de _cross validation_ **Holdout** com **50** iterações.
 
-A resposta do script principal tem foco na taxa de acerto em cada iteração e média, além de mostrar a tabela de confusão média das iterações.
+A resposta do script principal tem foco na taxa de acerto em cada iteração e média, além de mostrar a tabela de confusão média das iterações e a média de tempo de cada iteração.
 
 ### Melhores Resultados
 * Taxa de acertos
-![](https://raw.githubusercontent.com/abnersn/svm_optical_digits/master/Imagens/linear_accuracy.png)
+
+![](https://raw.githubusercontent.com/abnersn/svm_optical_digits/master/Imagens/polynomial2_accuracy.png)
+
 * Tabela de confusão
-![](https://raw.githubusercontent.com/abnersn/svm_optical_digits/master/Imagens/linear_confusion.png)
+
+![](https://raw.githubusercontent.com/abnersn/svm_optical_digits/master/Imagens/polynomial2_confusion.png)
 
 ### Apresentação em slides
 A apresentação em slides deste trabalho pode ser acessada pelo [link](https://docs.google.com/presentation/d/1kJDI6DaE-6iJ48yJFT4ZbIYKaY7nXtM-_rr7A5dn_F0/edit?usp=sharing).
